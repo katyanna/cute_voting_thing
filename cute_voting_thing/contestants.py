@@ -49,6 +49,14 @@ def update_contestant(contestant_id):
     contestant[0]['song'] = request.json.get('song', contestant[0]['song'])
     return jsonify({'contestant': contestant[0]})
 
+@app.route('/contestants/<int:contestant_id>', methods=['DELETE'])
+def delete_contestant(contestant_id):
+    contestant = [contestant for contestant in contestants if contestant['id'] == contestant_id]
+    if len(contestant) == 0:
+        abort(404)
+    contestants.remove(contestant[0])
+    return jsonify({'result': True})
+
 @app.errorhandler(404)
 def not_found(error):
     return make_response(jsonify({'error': 'Not found'}), 404)
