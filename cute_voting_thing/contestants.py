@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, abort, make_response, request
+from flask import Flask, jsonify, abort, make_response, request, url_for
 app = Flask(__name__)
 
 
@@ -17,14 +17,14 @@ contestants = [
 
 @app.route('/contestants')
 def get():
-    return jsonify({'contestants': contestants})
+    return jsonify({'contestants': [make_public_contestant(contestant) for contestant in contestants]})
 
 @app.route('/contestants/<int:contestant_id>')
 def get_contestant(contestant_id):
     contestant = [contestant for contestant in contestants if contestant['id'] == contestant_id]
     if len(contestant) == 0:
         abort(404)
-    return jsonify({'contestant': contestant[0]})
+    return jsonify({'contestant': [make_public_contestant(contestant[0])]})
 
 @app.route('/contestants', methods=['POST'])
 def create_contestant():
@@ -36,7 +36,7 @@ def create_contestant():
         'song': request.json['song']
     }
     contestants.append(contestant)
-    return jsonify({'contestant': contestant}), 201
+    return jsonify({'contestant': [make_public_contestant(contestant)]}), 201
 
 @app.route('/contestants/<int:contestant_id>', methods=['PUT'])
 def update_contestant(contestant_id):
@@ -47,7 +47,7 @@ def update_contestant(contestant_id):
         abort(400)
     contestant[0]['mc'] = request.json.get('mc', contestant[0]['mc'])
     contestant[0]['song'] = request.json.get('song', contestant[0]['song'])
-    return jsonify({'contestant': contestant[0]})
+    return jsonify({'contestant': [make_public_contestant(contestant[0])]})
 
 @app.route('/contestants/<int:contestant_id>', methods=['DELETE'])
 def delete_contestant(contestant_id):
@@ -56,6 +56,15 @@ def delete_contestant(contestant_id):
         abort(404)
     contestants.remove(contestant[0])
     return jsonify({'result': True})
+
+def make_public_contestant(contestant):
+    new_contestant = {}
+    for field in contestant:
+        if field == 'id':
+            new_contestant['uri'] = url_for('get_contestant', contestant_id=contestant['id'], _external=True)
+        else:
+            new_contestant[field] = contestant[field]
+    return new_contestant
 
 @app.errorhandler(404)
 def not_found(error):
@@ -68,7 +77,6 @@ def not_found(error):
 @app.errorhandler(405)
 def not_found(error):
     return make_response(jsonify({'error': 'Method not allowed'}), 405)
-
 
 if __name__ == '__main__':
     app.run(debug=True)
