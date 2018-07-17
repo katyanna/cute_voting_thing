@@ -1,4 +1,7 @@
 from flask import Flask, jsonify, abort, make_response, request, url_for
+from flask_httpauth import HTTPBasicAuth
+
+auth = HTTPBasicAuth()
 app = Flask(__name__)
 
 
@@ -20,6 +23,7 @@ def get():
     return jsonify({'contestants': [make_public_contestant(contestant) for contestant in contestants]})
 
 @app.route('/contestants/<int:contestant_id>')
+@auth.login_required
 def get_contestant(contestant_id):
     contestant = [contestant for contestant in contestants if contestant['id'] == contestant_id]
     if len(contestant) == 0:
@@ -27,6 +31,7 @@ def get_contestant(contestant_id):
     return jsonify({'contestant': [make_public_contestant(contestant[0])]})
 
 @app.route('/contestants', methods=['POST'])
+@auth.login_required
 def create_contestant():
     if not request.json or not 'mc' in request.json:
         abort(400)
@@ -39,6 +44,7 @@ def create_contestant():
     return jsonify({'contestant': [make_public_contestant(contestant)]}), 201
 
 @app.route('/contestants/<int:contestant_id>', methods=['PUT'])
+@auth.login_required
 def update_contestant(contestant_id):
     contestant = [contestant for contestant in contestants if contestant['id'] == contestant_id]
     if len(contestant) == 0:
@@ -50,6 +56,7 @@ def update_contestant(contestant_id):
     return jsonify({'contestant': [make_public_contestant(contestant[0])]})
 
 @app.route('/contestants/<int:contestant_id>', methods=['DELETE'])
+@auth.login_required
 def delete_contestant(contestant_id):
     contestant = [contestant for contestant in contestants if contestant['id'] == contestant_id]
     if len(contestant) == 0:
@@ -65,6 +72,16 @@ def make_public_contestant(contestant):
         else:
             new_contestant[field] = contestant[field]
     return new_contestant
+
+@auth.get_password
+def get_password(username):
+    if username == 'fulano':
+        return 'python'
+    return None
+
+@auth.error_handler
+def unauthorized():
+    return make_response(jsonify({'error': 'Unauthorized access'}), 401)
 
 @app.errorhandler(404)
 def not_found(error):
