@@ -46,13 +46,20 @@ def get():
 
     return jsonify(musics = musics)
 
-@app.route('/contestants/<int:contestant_id>')
-@auth.login_required
-def get_contestant(contestant_id):
-    contestant = [contestant for contestant in contestants if contestant['id'] == contestant_id]
-    if len(contestant) == 0:
+@app.route('/musics/<int:music_id>')
+#@auth.login_required
+def get_music(music_id):
+    conn = create_connection(DATABASE)
+    cur = conn.cursor()
+    music_id = (music_id,)
+    cur.execute('SELECT * FROM musics WHERE id=?', music_id)
+
+    music = cur.fetchone()
+
+    if len(music) == 0:
         abort(404)
-    return jsonify({'contestant': [make_public_contestant(contestant[0])]})
+
+    return jsonify(music = music)
 
 @app.route('/contestants/<int:contestant_id>', methods=['PUT'])
 @auth.login_required
