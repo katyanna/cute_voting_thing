@@ -1,22 +1,40 @@
+#! /usr/bin/python
 from flask import Flask, jsonify, abort, make_response, request, url_for
 from flask_httpauth import HTTPBasicAuth
+import sqlite3
+from sqlite3 import Error
+import errors
 
-auth = HTTPBasicAuth()
+DATABASE = "cvt.db"
 app = Flask(__name__)
+auth = HTTPBasicAuth()
 
+def create_connection(db_file):
+    try:
+        conn = sqlite3.connect(db_file)
+        return conn
+    except Error as e:
+        print(e)
 
-contestants = [
-    {
-        'id': 1,
-        'mc': u'mc livinho',
-        'song': u'fazer falta'
-    },
-    {
-        'id': 2,
-        'mc': u'kevinho',
-        'song': u'rabiola'
-    }
-]
+    return None
+
+@app.route('/musics', methods=['POST'])
+#@auth.login_required
+def create_music():
+    conn = create_connection(DATABASE)
+
+    title = request.json['title']
+    artist = request.json['artist']
+    music = (title, artist)
+
+    sql = ''' INSERT INTO musics(title,artist)
+                VALUES(?,?) '''
+
+    cur = conn.cursor()
+    cur.execute(sql, music)
+    conn.commit()
+
+    return jsonify(cur.lastrowid)
 
 @app.route('/contestants')
 def get():
@@ -29,19 +47,6 @@ def get_contestant(contestant_id):
     if len(contestant) == 0:
         abort(404)
     return jsonify({'contestant': [make_public_contestant(contestant[0])]})
-
-@app.route('/contestants', methods=['POST'])
-@auth.login_required
-def create_contestant():
-    if not request.json or not 'mc' in request.json:
-        abort(400)
-    contestant = {
-        'id': contestants[-1]['id'] + 1,
-        'mc': request.json['mc'],
-        'song': request.json['song']
-    }
-    contestants.append(contestant)
-    return jsonify({'contestant': [make_public_contestant(contestant)]}), 201
 
 @app.route('/contestants/<int:contestant_id>', methods=['PUT'])
 @auth.login_required
