@@ -36,9 +36,15 @@ def create_music():
 
     return jsonify(cur.lastrowid)
 
-@app.route('/contestants')
+@app.route('/musics')
 def get():
-    return jsonify({'contestants': [make_public_contestant(contestant) for contestant in contestants]})
+    conn = create_connection(DATABASE)
+    cur = conn.cursor()
+    cur.execute('SELECT * FROM musics')
+
+    musics = cur.fetchall()
+
+    return jsonify(musics = musics)
 
 @app.route('/contestants/<int:contestant_id>')
 @auth.login_required
