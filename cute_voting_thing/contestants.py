@@ -51,8 +51,7 @@ def get():
 def get_music(music_id):
     conn = create_connection(DATABASE)
     cur = conn.cursor()
-    music_id = (music_id,)
-    cur.execute('SELECT * FROM musics WHERE id=?', music_id)
+    cur.execute('SELECT * FROM musics WHERE id=?', (music_id,))
 
     music = cur.fetchone()
 
