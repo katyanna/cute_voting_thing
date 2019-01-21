@@ -61,17 +61,39 @@ def get_music(music_id):
 
     return jsonify(music = music)
 
-@app.route('/contestants/<int:contestant_id>', methods=['PUT'])
-@auth.login_required
-def update_contestant(contestant_id):
-    contestant = [contestant for contestant in contestants if contestant['id'] == contestant_id]
-    if len(contestant) == 0:
+@app.route('/musics/<int:music_id>', methods=['PUT'])
+#@auth.login_required
+def update_music(music_id):
+    conn = create_connection(DATABASE)
+    cur = conn.cursor()
+    cur.execute('SELECT * FROM musics WHERE id=?', (music_id,))
+
+    music = cur.fetchone()
+
+    if len(music) == 0:
         abort(404)
     if not request.json:
         abort(400)
-    contestant[0]['mc'] = request.json.get('mc', contestant[0]['mc'])
-    contestant[0]['song'] = request.json.get('song', contestant[0]['song'])
-    return jsonify({'contestant': [make_public_contestant(contestant[0])]})
+    if 'title' in request.json and type(request.json['title']) != str:
+        abort(400)
+    if 'artist' in request.json and type(request.json['artist']) != str:
+        abort(400)
+
+    req_data = request.get_json()
+
+
+    if 'title' in req_data:
+        title = req_data['title']
+        cur.execute(' UPDATE musics SET title = ? WHERE id = ?', (title, music_id,))
+    if 'artist' in req_data:
+        artist = req_data['artist']
+        cur.execute(' UPDATE musics SET artist = ? WHERE id = ?', (artist, music_id,))
+    conn.commit()
+
+    cur.execute('SELECT * FROM musics WHERE id=?', (music_id,))
+    updated_music = cur.fetchone()
+
+    return jsonify(music = updated_music) 
 
 @app.route('/contestants/<int:contestant_id>', methods=['DELETE'])
 @auth.login_required
