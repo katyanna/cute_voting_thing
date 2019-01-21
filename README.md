@@ -10,12 +10,11 @@ $ pip install -r requirements.txt
 
 ## Usage
 ```
-$ chmod a+x contestants.py
-$ ./contestants.py
-$ curl -i http://localhost:5000/contestants
-$ curl -i http://localhost:5000/contestants/1
-$ curl -i -H "Content-Type: application/json" -X POST -d '{"mc":"mc_name"}' http://localhost:5000/contestants
-$ curl -i -H "Content-Type: application/json" -X PUT -d '{"music":"music_title"}' http://localhost:5000/contestants/1
-$ curl -i -H "Content-Type: application/json" -X DELETE -d http://localhost:5000/contestants/1
+$ chmod a+x musics.py
+$ python musics.py
+$ curl -i http://localhost:5000/musics
+$ curl -i http://localhost:5000/musics/1
+$ curl -i -H "Content-Type: application/json" -X POST -d '{"artist":"artist_name"}' http://localhost:5000/musics
+$ curl -i -H "Content-Type: application/json" -X PUT -d '{"title":"music_title"}' http://localhost:5000/musics/1
+$ curl -i -H "Content-Type: application/json" -X DELETE http://localhost:5000/musics/1
 ```
-
