@@ -1,5 +1,6 @@
 # cute voting thing
-A poll.
+Toy project where I explore Python, Flask, databases and other
+technologies and techniques while building a RESTfull API of a poll.
 
 ## Setup
 ```
