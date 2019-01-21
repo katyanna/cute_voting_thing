@@ -110,16 +110,7 @@ def delete_music(music_id):
 
     return jsonify({'Deleted': True})
 
-def make_public_contestant(contestant):
-    new_contestant = {}
-    for field in contestant:
-        if field == 'id':
-            new_contestant['uri'] = url_for('get_contestant', contestant_id=contestant['id'], _external=True)
-        else:
-            new_contestant[field] = contestant[field]
-    return new_contestant
-
-@auth.get_password
+#@auth.get_password
 def get_password(username):
     if username == 'fulano':
         return 'python'
