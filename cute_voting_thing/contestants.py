@@ -80,7 +80,6 @@ def update_music(music_id):
 
     req_data = request.get_json()
 
-
     if 'title' in req_data:
         title = req_data['title']
         cur.execute(' UPDATE musics SET title = ? WHERE id = ?', (title, music_id,))
@@ -94,14 +93,22 @@ def update_music(music_id):
 
     return jsonify(music = updated_music) 
 
-@app.route('/contestants/<int:contestant_id>', methods=['DELETE'])
-@auth.login_required
-def delete_contestant(contestant_id):
-    contestant = [contestant for contestant in contestants if contestant['id'] == contestant_id]
-    if len(contestant) == 0:
+@app.route('/musics/<int:music_id>', methods=['DELETE'])
+#@auth.login_required
+def delete_music(music_id):
+    conn = create_connection(DATABASE)
+    cur = conn.cursor()
+    cur.execute('SELECT * FROM musics WHERE id=?', (music_id,))
+
+    music = cur.fetchone()
+
+    if len(music) == 0:
         abort(404)
-    contestants.remove(contestant[0])
-    return jsonify({'result': True})
+
+    cur.execute('DELETE FROM musics WHERE id=?', (music_id,))
+    conn.commit()
+
+    return jsonify({'Deleted': True})
 
 def make_public_contestant(contestant):
     new_contestant = {}
