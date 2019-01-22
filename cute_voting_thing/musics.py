@@ -19,7 +19,7 @@ def create_connection(db_file):
     return None
 
 @app.route('/musics', methods=['POST'])
-#@auth.login_required
+@auth.login_required
 def create_music():
     conn = create_connection(DATABASE)
 
@@ -47,7 +47,7 @@ def get():
     return jsonify(musics = musics)
 
 @app.route('/musics/<int:music_id>')
-#@auth.login_required
+@auth.login_required
 def get_music(music_id):
     conn = create_connection(DATABASE)
     cur = conn.cursor()
@@ -61,7 +61,7 @@ def get_music(music_id):
     return jsonify(music = music)
 
 @app.route('/musics/<int:music_id>', methods=['PUT'])
-#@auth.login_required
+@auth.login_required
 def update_music(music_id):
     conn = create_connection(DATABASE)
     cur = conn.cursor()
@@ -94,7 +94,7 @@ def update_music(music_id):
     return jsonify(music = updated_music) 
 
 @app.route('/musics/<int:music_id>', methods=['DELETE'])
-#@auth.login_required
+@auth.login_required
 def delete_music(music_id):
     conn = create_connection(DATABASE)
     cur = conn.cursor()
@@ -110,7 +110,7 @@ def delete_music(music_id):
 
     return jsonify({'Deleted': True})
 
-#@auth.get_password
+@auth.get_password
 def get_password(username):
     if username == 'fulano':
         return 'python'
