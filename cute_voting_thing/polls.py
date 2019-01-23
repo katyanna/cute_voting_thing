@@ -22,13 +22,13 @@ def create_poll():
 
     begin_date = request.json['begin_date']
     end_date = request.json['end_date']
-    poll_a_id = request.json['music_a_id']
-    poll_b_id = request.json['music_b_id']
+    music_a_id = request.json['music_a_id']
+    music_b_id = request.json['music_b_id']
     user_id = request.json['user_id']
 
-    poll = (begin_date, end_date, poll_a_id, music_b_id, user_id)
+    poll = (begin_date, end_date, music_a_id, music_b_id, user_id)
 
-    sql = ''' INSERT INTO polls(begin_date, end_date, poll_a_id, music_b_id, user_id)
+    sql = ''' INSERT INTO polls(begin_date, end_date, music_a_id, music_b_id, user_id)
                 VALUES(?, ?, ?, ?, ?)'''
 
     cur = conn.cursor()
