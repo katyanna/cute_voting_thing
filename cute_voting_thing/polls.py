@@ -35,7 +35,11 @@ def create_poll():
     cur.execute(sql, poll)
     conn.commit()
 
-    return jsonify(cur.lastrowid)
+    poll_id = cur.lastrowid
+    cur.execute('SELECT * FROM polls WHERE id=?', (poll_id,))
+    poll = cur.fetchone()
+
+    return jsonify(poll = poll)
 
 @app.route('/polls')
 def get():
