@@ -34,7 +34,11 @@ def create_music():
     cur.execute(sql, music)
     conn.commit()
 
-    return jsonify(cur.lastrowid)
+    music_id = cur.lastrowid
+    cur.execute('SELECT * FROM musics WHERE id=?', (music_id,))
+    music = cur.fetchone()
+
+    return jsonify(music = music)
 
 @app.route('/musics')
 def get():
